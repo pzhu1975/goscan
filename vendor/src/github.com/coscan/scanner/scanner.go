@@ -429,10 +429,10 @@ exponent:
 		}
 	}
 
-	if s.ch == 'i' {
-		tok = token.IMAG
-		s.next()
-	}
+	// if s.ch == 'i' {
+	// 	tok = token.IMAG
+	// 	s.next()
+	// }
 
 exit:
 	return tok, string(s.src[offs:s.offset])
@@ -722,10 +722,22 @@ scanAgain:
 			insertSemi = true
 			tok = token.STRING
 			lit = s.scanString()
+		case '?':
+			insertSemi = true
+			tok = token.QUESTIONMARK
+			lit = s.scanRune()
+		case '#':
+			insertSemi = true
+			tok = token.PREPROCESSOR
+			lit = s.scanRune()
 		case '\'':
 			insertSemi = true
 			tok = token.CHAR
 			lit = s.scanRune()
+		case '~':
+			insertSemi = true
+			tok = token.TILDE
+			lit = s.scanRawString()			
 		case '`':
 			insertSemi = true
 			tok = token.STRING
@@ -771,9 +783,14 @@ scanAgain:
 				insertSemi = true
 			}
 		case '-':
-			tok = s.switch3(token.SUB, token.SUB_ASSIGN, '-', token.DEC)
-			if tok == token.DEC {
-				insertSemi = true
+			if s.ch == '>' {
+				s.next()
+				tok = token.MINUSGREATER
+			} else {
+				tok = s.switch3(token.SUB, token.SUB_ASSIGN, '-', token.DEC)
+				if tok == token.DEC {
+					insertSemi = true
+				}
 			}
 		case '*':
 			tok = s.switch2(token.MUL, token.MUL_ASSIGN)

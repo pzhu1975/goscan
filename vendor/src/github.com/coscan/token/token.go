@@ -25,18 +25,19 @@ const (
 	IDENT  // main
 	INT    // 12345
 	FLOAT  // 123.45
-	IMAG   // 123.45i
+	// IMAG   // 123.45i
 	CHAR   // 'a'
 	STRING // "abc"
 	literal_end
 
 	operator_beg
 	// Operators and delimiters
-	ADD // +
-	SUB // -
-	MUL // *
-	QUO // /
-	REM // %
+	ADD   // +
+	SUB   // -
+	MUL   // *
+	QUO   // /
+	REM   // %
+	TILDE // ~
 
 	AND     // &
 	OR      // |
@@ -56,7 +57,7 @@ const (
 	XOR_ASSIGN     // ^=
 	SHL_ASSIGN     // <<=
 	SHR_ASSIGN     // >>=
-	AND_NOT_ASSIGN // &^=
+	// AND_NOT_ASSIGN // &^=
 
 	LAND  // &&
 	LOR   // ||
@@ -69,6 +70,11 @@ const (
 	GTR    // >
 	ASSIGN // =
 	NOT    // !
+	QUESTIONMARK // ?
+	PREPROCESSOR // #
+	BACKSLASH // \\
+	MINUSGREATER // ->
+	HASHHASH // ##
 
 	NEQ      // !=
 	LEQ      // <=
@@ -91,34 +97,76 @@ const (
 
 	keyword_beg
 	// Keywords
+	AUTO
 	BREAK
 	CASE
-	CHAN
+	// CHAN
 	CONST
 	CONTINUE
 
 	DEFAULT
-	DEFER
+	DO
+	DOUBLE
+	// DEFER
 	ELSE
-	FALLTHROUGH
+	ENUM
+	EXTERN
+	// FALLTHROUGH
 	FOR
 
-	FUNC
-	GO
+	// FUNC
+	// GO
 	GOTO
 	IF
 	IMPORT
+	WHILE
 
-	INTERFACE
-	MAP
+	// INTERFACE
+	// MAP
 	PACKAGE
-	RANGE
+	// RANGE
 	RETURN
 
-	SELECT
+	// SELECT
 	STRUCT
 	SWITCH
 	TYPE
+	LONG
+	REGISTER
+	SIZEOF
+	STATIC
+	TYPEDEF
+	UNION
+	SHORT
+	SIGNED
+	UNSIGNED
+	VOID
+	VOLATILE
+	PRAGMA
+	__VOLATILE
+	__VOLATILE__
+	_COMPLEX
+	__COMPLEX__
+	__COMPLEX
+	__FUNC__
+	_IMAGINARY
+	INLINE
+	__INLINE
+	__INLINE__
+	__RESTRICT__
+	__RESTRICT__
+	__RESTRICT
+	_ATOMIC
+	__THREAD
+	ASM
+	__ASM__
+	__ASM
+	TYPEOF
+	__TYPEOF__
+	__ATTRIBUTE__
+	ALIGNED
+	PACK
+	PACKED
 	VAR
 	keyword_end
 )
@@ -132,15 +180,16 @@ var tokens = [...]string{
 	IDENT:  "IDENT",
 	INT:    "INT",
 	FLOAT:  "FLOAT",
-	IMAG:   "IMAG",
+	// IMAG:   "IMAG",
 	CHAR:   "CHAR",
 	STRING: "STRING",
 
-	ADD: "+",
-	SUB: "-",
-	MUL: "*",
-	QUO: "/",
-	REM: "%",
+	ADD:   "+",
+	SUB:   "-",
+	MUL:   "*",
+	QUO:   "/",
+	REM:   "%",
+	TILDE: "~",
 
 	AND:     "&",
 	OR:      "|",
@@ -160,7 +209,7 @@ var tokens = [...]string{
 	XOR_ASSIGN:     "^=",
 	SHL_ASSIGN:     "<<=",
 	SHR_ASSIGN:     ">>=",
-	AND_NOT_ASSIGN: "&^=",
+	// AND_NOT_ASSIGN: "&^=",
 
 	LAND:  "&&",
 	LOR:   "||",
@@ -173,6 +222,11 @@ var tokens = [...]string{
 	GTR:    ">",
 	ASSIGN: "=",
 	NOT:    "!",
+	QUESTIONMARK: "?"
+	PREPROCESSOR: "#"
+	BACKSLASH: "\\"
+	MINUSGREATER: "->"
+	HASHHASH: "##"
 
 	NEQ:      "!=",
 	LEQ:      "<=",
@@ -192,34 +246,77 @@ var tokens = [...]string{
 	SEMICOLON: ";",
 	COLON:     ":",
 
+	AUTO:	  "auto"
 	BREAK:    "break",
 	CASE:     "case",
-	CHAN:     "chan",
+	// CHAN:     "chan",
 	CONST:    "const",
 	CONTINUE: "continue",
 
 	DEFAULT:     "default",
-	DEFER:       "defer",
+	DO:			"do",
+	// DEFER:       "defer",
+	DOUBLE:		"double"
 	ELSE:        "else",
-	FALLTHROUGH: "fallthrough",
+	ENUM:		 "enum",
+	EXTERN:		 "extern",
+	// FALLTHROUGH: "fallthrough",
 	FOR:         "for",
 
-	FUNC:   "func",
-	GO:     "go",
+	// FUNC:   "func",
+	// GO:     "go",
 	GOTO:   "goto",
 	IF:     "if",
 	IMPORT: "import",
+	WHILE:	"while",
 
-	INTERFACE: "interface",
-	MAP:       "map",
+	// INTERFACE: "interface",
+	// MAP:       "map",
 	PACKAGE:   "package",
-	RANGE:     "range",
+	// RANGE:     "range",
 	RETURN:    "return",
 
-	SELECT: "select",
+	// SELECT: "select",
 	STRUCT: "struct",
 	SWITCH: "switch",
 	TYPE:   "type",
+	LONG:	"long",
+	REGISTER: "register",
+	SHORT: "short",
+	SIGNED: "signed",
+	SIZEOF: "sizeof"
+	STATIC: "static"
+	TYPEDEF: "typedef",
+	UNION: "union",
+	UNSIGNED: "unsigned",
+	VOID:	"void",
+	VOLATILE: "volatile",
+	PRAGMA: "pragma",
+	__VOLATILE: "__volatile",
+	__VOLATILE__: "__volatile__",
+	_BOOL: "_Bool",
+	_COMPLEX: "_Complex",
+	__COMPLEX__: "__complex__",
+	__COMPLEX: "__complex",
+	__FUNC__: "__func__",
+	__FUNCTION__: "__FUNCTION__",
+	_IMAGINARY: "_Imaginary",
+	INLINE: "inline",
+	__INLINE: "__inline",
+	__INLINE__: "__inline__",
+	__RESTRICT__: "__restrict__",
+	__RESTRICT: "__restrict",
+	_ATOMIC: "_Atomic",
+	__THREAD: "__thread",
+	ASM: "asm",
+	__ASM__: "__asm__",
+	__ASM: "__asm",
+	TYPEOF: "typeof",
+	__TYPEOF__: "__typeof__",
+	__ATTRIBUTE__: "__attribute__",
+	ALIGNED: "aligned",
+	PACK: "pack",
+	PACKED: "packed",
 	VAR:    "var",
 }
 
